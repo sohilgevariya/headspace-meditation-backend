@@ -34,11 +34,13 @@ router.put('/user/block', adminController?.user_block)
 
 //  ------  Course Routes  ------
 router.get('/course', adminController.get_course);
+router.get('/course/category_wise/:id', courseValidation.by_id, adminController.get_category_wise_course);
 router.post('/course/add', courseValidation.add_course, adminController.add_course);
 router.put('/course/update', courseValidation.update_course, adminController.update_course);
 router.get('/course/:id', courseValidation.by_id, adminController.course_by_id);
 router.post('/course/filter_course', adminController.get_course_pagination);
-router.get('/course/category/:id', courseValidation.by_id, adminController.get_course_category_wise);
+router.post('/course/search', adminController.get_course_search);
+router.post('/course/category', adminController.get_course_category_wise);
 router.delete('/course/:id', courseValidation.by_id, adminController.delete_course);
 
 //  ------  Episode Routes  ------
@@ -47,6 +49,7 @@ router.post('/episode/add', episodeValidation.add_episode, adminController.add_e
 router.put('/episode/update', episodeValidation.update_episode, adminController.update_episode);
 router.get('/episode/get', adminController.get_episode_not_selected);
 router.get('/episode/:id', episodeValidation.by_id, adminController.episode_by_id);
+router.get('/episode/course/:id', episodeValidation.by_id, adminController.get_episode_by_course);
 router.post('/episode/filter_episode', adminController.get_episode_pagination);
 router.put('/episode/morning/add', adminController.add_morning_episode);
 router.put('/episode/afternoon/add', adminController.add_afternoon_episode);

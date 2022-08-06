@@ -33,11 +33,13 @@ router.get('/user/:id', validation_1.userValidation?.by_id, controllers_1.adminC
 router.put('/user/block', controllers_1.adminController?.user_block);
 //  ------  Course Routes  ------
 router.get('/course', controllers_1.adminController.get_course);
+router.get('/course/category_wise/:id', validation_1.courseValidation.by_id, controllers_1.adminController.get_category_wise_course);
 router.post('/course/add', validation_1.courseValidation.add_course, controllers_1.adminController.add_course);
 router.put('/course/update', validation_1.courseValidation.update_course, controllers_1.adminController.update_course);
 router.get('/course/:id', validation_1.courseValidation.by_id, controllers_1.adminController.course_by_id);
 router.post('/course/filter_course', controllers_1.adminController.get_course_pagination);
-router.get('/course/category/:id', validation_1.courseValidation.by_id, controllers_1.adminController.get_course_category_wise);
+router.post('/course/search', controllers_1.adminController.get_course_search);
+router.post('/course/category', controllers_1.adminController.get_course_category_wise);
 router.delete('/course/:id', validation_1.courseValidation.by_id, controllers_1.adminController.delete_course);
 //  ------  Episode Routes  ------
 router.get('/episode', controllers_1.adminController.get_episode);
@@ -45,6 +47,7 @@ router.post('/episode/add', validation_1.episodeValidation.add_episode, controll
 router.put('/episode/update', validation_1.episodeValidation.update_episode, controllers_1.adminController.update_episode);
 router.get('/episode/get', controllers_1.adminController.get_episode_not_selected);
 router.get('/episode/:id', validation_1.episodeValidation.by_id, controllers_1.adminController.episode_by_id);
+router.get('/episode/course/:id', validation_1.episodeValidation.by_id, controllers_1.adminController.get_episode_by_course);
 router.post('/episode/filter_episode', controllers_1.adminController.get_episode_pagination);
 router.put('/episode/morning/add', controllers_1.adminController.add_morning_episode);
 router.put('/episode/afternoon/add', controllers_1.adminController.add_afternoon_episode);

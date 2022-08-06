@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.add_course_feature = exports.get_course_category_wise = exports.get_course_pagination = exports.delete_course = exports.get_course = exports.course_by_id = exports.update_course = exports.add_course = void 0;
+exports.get_category_wise_course = exports.add_course_feature = exports.get_course_category_wise = exports.get_course_pagination = exports.delete_course = exports.get_course_search = exports.get_course = exports.course_by_id = exports.update_course = exports.add_course = void 0;
 const winston_logger_1 = require("../../helpers/winston_logger");
 const database_1 = require("../../database");
 const common_1 = require("../../common");
@@ -130,8 +130,27 @@ const get_course = async (req, res) => {
                 },
             },
             {
+                $lookup: {
+                    from: "categories",
+                    let: { categoryId: "$categoryId" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$_id", "$$categoryId"] },
+                                        { $eq: ["$isActive", true] },
+                                    ],
+                                },
+                            },
+                        }
+                    ],
+                    as: "category",
+                },
+            },
+            {
                 $project: {
-                    title: 1, image: 1, description: 1, categoryId: 1, episodeCount: { $first: "$episode.count" }
+                    title: 1, image: 1, description: 1, categoryId: 1, episodeCount: { $first: "$episode.count" }, category: { $first: "$category.name" },
                 }
             },
             { $sort: { createdAt: -1 } }
@@ -149,6 +168,86 @@ const get_course = async (req, res) => {
     }
 };
 exports.get_course = get_course;
+const get_course_search = async (req, res) => {
+    (0, winston_logger_1.reqInfo)(req);
+    let { search } = req.body, match = {};
+    try {
+        if (search) {
+            var titleArray = [];
+            search = search.split(" ");
+            search.forEach(data => {
+                titleArray.push({ title: { $regex: data, $options: 'si' } });
+            });
+            match.$or = [{ $and: titleArray }];
+        }
+        // let response = await courseModel.find({ isActive: true }, { title: 1, image: 1, description: 1, }).sort({ createdAt: -1 })
+        let response = await database_1.courseModel.aggregate([
+            {
+                $match: {
+                    isActive: true, ...match
+                },
+            },
+            {
+                $lookup: {
+                    from: "episodes",
+                    let: { courseId: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$courseId", "$$courseId"] },
+                                        { $eq: ["$isActive", true] },
+                                    ],
+                                },
+                            },
+                        },
+                        {
+                            $count: "count"
+                        }
+                    ],
+                    as: "episode",
+                },
+            },
+            {
+                $lookup: {
+                    from: "categories",
+                    let: { categoryId: "$categoryId" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$_id", "$$categoryId"] },
+                                        { $eq: ["$isActive", true] },
+                                    ],
+                                },
+                            },
+                        }
+                    ],
+                    as: "category",
+                },
+            },
+            {
+                $project: {
+                    title: 1, image: 1, description: 1, categoryId: 1, episodeCount: { $first: "$episode.count" }, category: { $first: "$category.name" },
+                }
+            },
+            { $sort: { createdAt: -1 } }
+        ]);
+        if (response)
+            return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.getDataSuccess("course"), response));
+        else
+            return res.status(400).json(new common_1.apiResponse(400, helpers_1.responseMessage?.getDataNotFound("course"), {}));
+    }
+    catch (error) {
+        console.log(error);
+        return res
+            .status(500)
+            .json(new common_1.apiResponse(500, helpers_1.responseMessage?.internalServerError, error));
+    }
+};
+exports.get_course_search = get_course_search;
 const delete_course = async (req, res) => {
     (0, winston_logger_1.reqInfo)(req);
     let id = req.params.id;
@@ -260,8 +359,20 @@ const get_course_pagination = async (req, res) => {
 exports.get_course_pagination = get_course_pagination;
 const get_course_category_wise = async (req, res) => {
     (0, winston_logger_1.reqInfo)(req);
+    let { id, search } = req.body, match = {};
     try {
-        let response = await database_1.courseModel.find({ categoryId: ObjectId(req.params.id), isActive: true });
+        if (search) {
+            var titleArray = [];
+            search = search.split(" ");
+            search.forEach(data => {
+                titleArray.push({ title: { $regex: data, $options: 'si' } });
+            });
+            match.$or = [{ $and: titleArray }];
+        }
+        // let response: any = await courseModel.find({ categoryId: ObjectId(req.params.id), isActive: true })
+        let response = await database_1.courseModel.aggregate([
+            { $match: { categoryId: ObjectId(id), isActive: true, ...match } },
+        ]);
         return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.getDataSuccess("course"), response));
     }
     catch (error) {
@@ -289,4 +400,18 @@ const add_course_feature = async (req, res) => {
     }
 };
 exports.add_course_feature = add_course_feature;
+const get_category_wise_course = async (req, res) => {
+    (0, winston_logger_1.reqInfo)(req);
+    try {
+        let response = await database_1.courseModel.find({ categoryId: ObjectId(req.params.id), isActive: true });
+        return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.getDataSuccess("course"), response));
+    }
+    catch (error) {
+        console.log(error);
+        return res
+            .status(500)
+            .json(new common_1.apiResponse(500, helpers_1.responseMessage?.internalServerError, {}));
+    }
+};
+exports.get_category_wise_course = get_category_wise_course;
 //# sourceMappingURL=course.js.map

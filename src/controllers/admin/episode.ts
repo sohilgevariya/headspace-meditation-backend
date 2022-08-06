@@ -141,6 +141,19 @@ export const get_episode_pagination = async (req: Request, res: Response) => {
     }
 }
 
+export const get_episode_by_course = async (req: Request, res: Response) => {
+    reqInfo(req)
+    let response: any
+    try {
+        response = await episodeModel.find({ courseId: ObjectId(req.params.id), isActive: true })
+        if (response) return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess('episode'), response))
+        else return res.status(400).json(new apiResponse(400, responseMessage?.getDataNotFound('episode'), response))
+    } catch (error) {
+        console.log(error)
+        return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, {}))
+    }
+}
+
 export const add_morning_episode = async (req: Request, res: Response) => {
     reqInfo(req);
     let body = req.body;

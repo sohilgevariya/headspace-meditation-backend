@@ -78,38 +78,38 @@ const get_all_course = async (req, res) => {
     try {
         let response = await database_1.courseModel.aggregate([
             { $match: { isActive: true } },
-            {
-                $lookup: {
-                    from: "favorites",
-                    let: { courseId: "$_id" },
-                    pipeline: [
-                        {
-                            $match: {
-                                $expr: {
-                                    $and: [
-                                        { $eq: ["$courseId", "$$courseId"] },
-                                        { $eq: ["$isActive", true] },
-                                    ],
-                                },
-                            },
-                        },
-                    ],
-                    as: "favoriteBy",
-                },
-            },
+            // {
+            //   $lookup: {
+            //     from: "favorites",
+            //     let: { courseId: "$_id" },
+            //     pipeline: [
+            //       {
+            //         $match: {
+            //           $expr: {
+            //             $and: [
+            //               { $eq: ["$courseId", "$$courseId"] },
+            //               { $eq: ["$isActive", true] },
+            //             ],
+            //           },
+            //         },
+            //       },
+            //     ],
+            //     as: "favoriteBy",
+            //   },
+            // },
             {
                 $project: {
                     title: 1,
                     image: 1,
                     description: 1,
                     isPremium: 1,
-                    isFavorite: {
-                        $cond: {
-                            if: { $in: [ObjectId(user?._id), "$favoriteBy.userId"] },
-                            then: true,
-                            else: false,
-                        },
-                    },
+                    // isFavorite: {
+                    //   $cond: {
+                    //     if: { $in: [ObjectId(user?._id), "$favoriteBy.userId"] },
+                    //     then: true,
+                    //     else: false,
+                    //   },
+                    // },
                 },
             },
             { $sort: { createdAt: -1 } },
@@ -117,7 +117,7 @@ const get_all_course = async (req, res) => {
         if (response) {
             return res
                 .status(200)
-                .json(new common_1.apiResponse(200, helpers_1.responseMessage?.getDataSuccess("course"), {}));
+                .json(new common_1.apiResponse(200, helpers_1.responseMessage?.getDataSuccess("course"), response));
         }
         else
             return res

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get_episode_not_selected = exports.add_night_episode = exports.add_afternoon_episode = exports.add_morning_episode = exports.get_episode_pagination = exports.delete_episode = exports.get_episode = exports.episode_by_id = exports.update_episode = exports.add_episode = void 0;
+exports.get_episode_not_selected = exports.add_night_episode = exports.add_afternoon_episode = exports.add_morning_episode = exports.get_episode_by_course = exports.get_episode_pagination = exports.delete_episode = exports.get_episode = exports.episode_by_id = exports.update_episode = exports.add_episode = void 0;
 const winston_logger_1 = require("../../helpers/winston_logger");
 const database_1 = require("../../database");
 const common_1 = require("../../common");
@@ -153,6 +153,22 @@ const get_episode_pagination = async (req, res) => {
     }
 };
 exports.get_episode_pagination = get_episode_pagination;
+const get_episode_by_course = async (req, res) => {
+    (0, winston_logger_1.reqInfo)(req);
+    let response;
+    try {
+        response = await database_1.episodeModel.find({ courseId: ObjectId(req.params.id), isActive: true });
+        if (response)
+            return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.getDataSuccess('episode'), response));
+        else
+            return res.status(400).json(new common_1.apiResponse(400, helpers_1.responseMessage?.getDataNotFound('episode'), response));
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(new common_1.apiResponse(500, helpers_1.responseMessage?.internalServerError, {}));
+    }
+};
+exports.get_episode_by_course = get_episode_by_course;
 const add_morning_episode = async (req, res) => {
     (0, winston_logger_1.reqInfo)(req);
     let body = req.body;

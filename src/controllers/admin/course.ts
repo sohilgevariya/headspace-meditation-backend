@@ -160,8 +160,106 @@ export const get_course = async (req: Request, res: Response) => {
                 },
             },
             {
+                $lookup: {
+                    from: "categories",
+                    let: { categoryId: "$categoryId" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$_id", "$$categoryId"] },
+                                        { $eq: ["$isActive", true] },
+                                    ],
+                                },
+                            },
+                        }
+                    ],
+                    as: "category",
+                },
+            },
+            {
                 $project: {
-                    title: 1, image: 1, description: 1, categoryId: 1, episodeCount: { $first: "$episode.count" }
+                    title: 1, image: 1, description: 1, categoryId: 1, episodeCount: { $first: "$episode.count" }, category: { $first: "$category.name" },
+                }
+            },
+            { $sort: { createdAt: -1 } }
+        ]);
+        if (response)
+            return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("course"), response));
+        else
+            return res.status(400).json(new apiResponse(400, responseMessage?.getDataNotFound("course"), {}));
+    } catch (error) {
+        console.log(error);
+        return res
+            .status(500)
+            .json(new apiResponse(500, responseMessage?.internalServerError, error));
+    }
+};
+
+export const get_course_search = async (req: Request, res: Response) => {
+    reqInfo(req);
+    let { search } = req.body, match: any = {}
+    try {
+        if (search) {
+            var titleArray: Array<any> = []
+            search = search.split(" ")
+            search.forEach(data => {
+                titleArray.push({ title: { $regex: data, $options: 'si' } })
+            })
+            match.$or = [{ $and: titleArray }]
+        }
+        // let response = await courseModel.find({ isActive: true }, { title: 1, image: 1, description: 1, }).sort({ createdAt: -1 })
+        let response = await courseModel.aggregate([
+            {
+                $match: {
+                    isActive: true, ...match
+                },
+            },
+            {
+                $lookup: {
+                    from: "episodes",
+                    let: { courseId: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$courseId", "$$courseId"] },
+                                        { $eq: ["$isActive", true] },
+                                    ],
+                                },
+                            },
+                        },
+                        {
+                            $count: "count"
+                        }
+                    ],
+                    as: "episode",
+                },
+            },
+            {
+                $lookup: {
+                    from: "categories",
+                    let: { categoryId: "$categoryId" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$_id", "$$categoryId"] },
+                                        { $eq: ["$isActive", true] },
+                                    ],
+                                },
+                            },
+                        }
+                    ],
+                    as: "category",
+                },
+            },
+            {
+                $project: {
+                    title: 1, image: 1, description: 1, categoryId: 1, episodeCount: { $first: "$episode.count" }, category: { $first: "$category.name" },
                 }
             },
             { $sort: { createdAt: -1 } }
@@ -186,8 +284,8 @@ export const delete_course = async (req: Request, res: Response) => {
         let response = await courseModel.findByIdAndDelete({ _id: ObjectId(id) });
         if (response) {
             if (response.image != null || response.image != "") {
-                    let [folder_name, image_name] = await URL_decode(response?.image);
-                    await deleteImage(image_name, folder_name);
+                let [folder_name, image_name] = await URL_decode(response?.image);
+                await deleteImage(image_name, folder_name);
             }
             // await favoriteModel.findOneAndDelete({
             //     courseId: ObjectId(id),
@@ -301,8 +399,20 @@ export const get_course_pagination = async (req: Request, res: Response) => {
 
 export const get_course_category_wise = async (req: Request, res: Response) => {
     reqInfo(req);
+    let { id, search } = req.body, match: any = {}
     try {
-        let response: any = await courseModel.find({ categoryId: ObjectId(req.params.id), isActive: true })
+        if (search) {
+            var titleArray: Array<any> = []
+            search = search.split(" ")
+            search.forEach(data => {
+                titleArray.push({ title: { $regex: data, $options: 'si' } })
+            })
+            match.$or = [{ $and: titleArray }]
+        }
+        // let response: any = await courseModel.find({ categoryId: ObjectId(req.params.id), isActive: true })
+        let response: any = await courseModel.aggregate([
+            { $match: { categoryId: ObjectId(id), isActive: true, ...match } },
+        ])
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("course"), response))
     } catch (error) {
         console.log(error);
@@ -323,5 +433,18 @@ export const add_course_feature = async (req: Request, res: Response) => {
         return res
             .status(500)
             .json(new apiResponse(500, responseMessage?.internalServerError, error));
+    }
+};
+
+export const get_category_wise_course = async (req: Request, res: Response) => {
+    reqInfo(req);
+    try {
+        let response: any = await courseModel.find({ categoryId: ObjectId(req.params.id), isActive: true })
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("course"), response))
+    } catch (error) {
+        console.log(error);
+        return res
+            .status(500)
+            .json(new apiResponse(500, responseMessage?.internalServerError, {}));
     }
 };
