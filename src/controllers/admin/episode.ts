@@ -160,7 +160,7 @@ export const add_morning_episode = async (req: Request, res: Response) => {
     try {
         let add_morning_meditation = await episodeModel.findOneAndUpdate({ _id: ObjectId(body?.episodeId), isActive: true }, { isMorning: 1 })
         if (add_morning_meditation) {
-            await episodeModel.updateMany({ isMorning: 1 }, { isMorning: 2 })
+            await episodeModel.updateMany({ _id: { $ne: ObjectId(body?.episodeId) }, isMorning: 1 }, { isMorning: 2 })
             return res.status(200).json(new apiResponse(200, "Meditation added in morning", {}))
         }
         else return res.status(501).json(new apiResponse(501, responseMessage?.updateDataError('episode'), {}))
@@ -177,7 +177,7 @@ export const add_afternoon_episode = async (req: Request, res: Response) => {
     try {
         let add_afternoon_meditation = await episodeModel.findOneAndUpdate({ _id: ObjectId(body?.episodeId), isActive: true }, { isAfternoon: 1 })
         if (add_afternoon_meditation) {
-            await episodeModel.updateMany({ isAfternoon: 1 }, { isAfternoon: 2 })
+            await episodeModel.updateMany({ _id: { $ne: ObjectId(body?.episodeId) }, isAfternoon: 1 }, { isAfternoon: 2 })
             return res.status(200).json(new apiResponse(200, 'Meditation added in afternoon', {}))
         }
         else return res.status(501).json(new apiResponse(501, responseMessage?.updateDataError('episode'), {}))
@@ -194,7 +194,7 @@ export const add_night_episode = async (req: Request, res: Response) => {
     try {
         let add_night_meditation = await episodeModel.findOneAndUpdate({ _id: ObjectId(body?.episodeId), isActive: true }, { isNight: 1 })
         if (add_night_meditation) {
-            await episodeModel.updateMany({ isNight: 1 }, { isNight: 2 })
+            await episodeModel.updateMany({ _id: { $ne: ObjectId(body?.episodeId) }, isNight: 1 }, { isNight: 2 })
             return res.status(200).json(new apiResponse(200, 'Meditation added in night', {}))
         }
         else return res.status(501).json(new apiResponse(501, responseMessage?.updateDataError('episode'), {}))
@@ -205,10 +205,36 @@ export const add_night_episode = async (req: Request, res: Response) => {
     }
 };
 
-export const get_episode_not_selected = async (req: Request, res: Response) => {
+export const get_morning_episode = async (req: Request, res: Response) => {
     reqInfo(req);
     try {
-        let response: any = await episodeModel.find({ isMorning: 0, isAfternoon: 0, isNight: 0, isActive: true }, { title: 1 })
+        let response: any = await episodeModel.find({ $or: [{ isMorning: 0 }, { isMorning: 1 }], isAfternoon: 0, isNight: 0, isActive: true }, { title: 1, isMorning: 1 })
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("episode"), response))
+    } catch (error) {
+        console.log(error);
+        return res
+            .status(500)
+            .json(new apiResponse(500, responseMessage?.internalServerError, {}));
+    }
+};
+
+export const get_afternoon_episode = async (req: Request, res: Response) => {
+    reqInfo(req);
+    try {
+        let response: any = await episodeModel.find({ $or: [{ isAfternoon: 0 }, { isAfternoon: 1 }], isMorning: 0, isNight: 0, isActive: true }, { title: 1, isAfternoon: 1 })
+        return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("episode"), response))
+    } catch (error) {
+        console.log(error);
+        return res
+            .status(500)
+            .json(new apiResponse(500, responseMessage?.internalServerError, {}));
+    }
+};
+
+export const get_night_episode = async (req: Request, res: Response) => {
+    reqInfo(req);
+    try {
+        let response: any = await episodeModel.find({ $or: [{ isNight: 0 }, { isNight: 1 }], isAfternoon: 0, isMorning: 0, isActive: true }, { title: 1, isNight: 1 })
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("episode"), response))
     } catch (error) {
         console.log(error);

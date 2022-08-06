@@ -45,7 +45,9 @@ router.delete('/course/:id', validation_1.courseValidation.by_id, controllers_1.
 router.get('/episode', controllers_1.adminController.get_episode);
 router.post('/episode/add', validation_1.episodeValidation.add_episode, controllers_1.adminController.add_episode);
 router.put('/episode/update', validation_1.episodeValidation.update_episode, controllers_1.adminController.update_episode);
-router.get('/episode/get', controllers_1.adminController.get_episode_not_selected);
+router.get('/episode/get_morning', controllers_1.adminController.get_morning_episode);
+router.get('/episode/get_afternoon', controllers_1.adminController.get_afternoon_episode);
+router.get('/episode/get_night', controllers_1.adminController.get_night_episode);
 router.get('/episode/:id', validation_1.episodeValidation.by_id, controllers_1.adminController.episode_by_id);
 router.get('/episode/course/:id', validation_1.episodeValidation.by_id, controllers_1.adminController.get_episode_by_course);
 router.post('/episode/filter_episode', controllers_1.adminController.get_episode_pagination);

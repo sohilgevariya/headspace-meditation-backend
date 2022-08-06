@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get_episode_not_selected = exports.add_night_episode = exports.add_afternoon_episode = exports.add_morning_episode = exports.get_episode_by_course = exports.get_episode_pagination = exports.delete_episode = exports.get_episode = exports.episode_by_id = exports.update_episode = exports.add_episode = void 0;
+exports.get_night_episode = exports.get_afternoon_episode = exports.get_morning_episode = exports.add_night_episode = exports.add_afternoon_episode = exports.add_morning_episode = exports.get_episode_by_course = exports.get_episode_pagination = exports.delete_episode = exports.get_episode = exports.episode_by_id = exports.update_episode = exports.add_episode = void 0;
 const winston_logger_1 = require("../../helpers/winston_logger");
 const database_1 = require("../../database");
 const common_1 = require("../../common");
@@ -175,7 +175,7 @@ const add_morning_episode = async (req, res) => {
     try {
         let add_morning_meditation = await database_1.episodeModel.findOneAndUpdate({ _id: ObjectId(body?.episodeId), isActive: true }, { isMorning: 1 });
         if (add_morning_meditation) {
-            await database_1.episodeModel.updateMany({ isMorning: 1 }, { isMorning: 2 });
+            await database_1.episodeModel.updateMany({ _id: { $ne: ObjectId(body?.episodeId) }, isMorning: 1 }, { isMorning: 2 });
             return res.status(200).json(new common_1.apiResponse(200, "Meditation added in morning", {}));
         }
         else
@@ -194,7 +194,7 @@ const add_afternoon_episode = async (req, res) => {
     try {
         let add_afternoon_meditation = await database_1.episodeModel.findOneAndUpdate({ _id: ObjectId(body?.episodeId), isActive: true }, { isAfternoon: 1 });
         if (add_afternoon_meditation) {
-            await database_1.episodeModel.updateMany({ isAfternoon: 1 }, { isAfternoon: 2 });
+            await database_1.episodeModel.updateMany({ _id: { $ne: ObjectId(body?.episodeId) }, isAfternoon: 1 }, { isAfternoon: 2 });
             return res.status(200).json(new common_1.apiResponse(200, 'Meditation added in afternoon', {}));
         }
         else
@@ -213,7 +213,7 @@ const add_night_episode = async (req, res) => {
     try {
         let add_night_meditation = await database_1.episodeModel.findOneAndUpdate({ _id: ObjectId(body?.episodeId), isActive: true }, { isNight: 1 });
         if (add_night_meditation) {
-            await database_1.episodeModel.updateMany({ isNight: 1 }, { isNight: 2 });
+            await database_1.episodeModel.updateMany({ _id: { $ne: ObjectId(body?.episodeId) }, isNight: 1 }, { isNight: 2 });
             return res.status(200).json(new common_1.apiResponse(200, 'Meditation added in night', {}));
         }
         else
@@ -226,10 +226,10 @@ const add_night_episode = async (req, res) => {
     }
 };
 exports.add_night_episode = add_night_episode;
-const get_episode_not_selected = async (req, res) => {
+const get_morning_episode = async (req, res) => {
     (0, winston_logger_1.reqInfo)(req);
     try {
-        let response = await database_1.episodeModel.find({ isMorning: 0, isAfternoon: 0, isNight: 0, isActive: true }, { title: 1 });
+        let response = await database_1.episodeModel.find({ $or: [{ isMorning: 0 }, { isMorning: 1 }], isAfternoon: 0, isNight: 0, isActive: true }, { title: 1, isMorning: 1 });
         return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.getDataSuccess("episode"), response));
     }
     catch (error) {
@@ -239,5 +239,33 @@ const get_episode_not_selected = async (req, res) => {
             .json(new common_1.apiResponse(500, helpers_1.responseMessage?.internalServerError, {}));
     }
 };
-exports.get_episode_not_selected = get_episode_not_selected;
+exports.get_morning_episode = get_morning_episode;
+const get_afternoon_episode = async (req, res) => {
+    (0, winston_logger_1.reqInfo)(req);
+    try {
+        let response = await database_1.episodeModel.find({ $or: [{ isAfternoon: 0 }, { isAfternoon: 1 }], isMorning: 0, isNight: 0, isActive: true }, { title: 1, isAfternoon: 1 });
+        return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.getDataSuccess("episode"), response));
+    }
+    catch (error) {
+        console.log(error);
+        return res
+            .status(500)
+            .json(new common_1.apiResponse(500, helpers_1.responseMessage?.internalServerError, {}));
+    }
+};
+exports.get_afternoon_episode = get_afternoon_episode;
+const get_night_episode = async (req, res) => {
+    (0, winston_logger_1.reqInfo)(req);
+    try {
+        let response = await database_1.episodeModel.find({ $or: [{ isNight: 0 }, { isNight: 1 }], isAfternoon: 0, isMorning: 0, isActive: true }, { title: 1, isNight: 1 });
+        return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.getDataSuccess("episode"), response));
+    }
+    catch (error) {
+        console.log(error);
+        return res
+            .status(500)
+            .json(new common_1.apiResponse(500, helpers_1.responseMessage?.internalServerError, {}));
+    }
+};
+exports.get_night_episode = get_night_episode;
 //# sourceMappingURL=episode.js.map
