@@ -26,7 +26,7 @@ const mongoose_1 = require("mongoose");
 const helpers_1 = require("../helpers");
 const add = async (req, res, next) => {
     const schema = Joi.object({
-        videoId: Joi.string().error(new Error('videoId is required!')),
+        courseId: Joi.string().error(new Error('courseId is required!')),
     });
     schema.validateAsync(req.body).then(result => {
         return next();

@@ -28,10 +28,13 @@ router.post('/course/filter_course', userController.get_all_course_pagination);
 //  ------  Episode Routes  ------
 router.get('/episode/course/:id', courseValidation.by_id, userController.get_episode_by_course);
 
-//  ------  Favorite Video Routes  ------
-// router.get('/favorite', userController.get_favorite)
+//  ------  Dashboard Routes  ------
+router.get('/dashboard', userController.dashboard);
+
+//  ------  Favorite Course Routes  ------
+router.get('/favorite', userController.get_favorite)
 router.post('/favorite/add', favoriteValidation.add, userController.add_favorite)
-// router.post('/favorite/video', userController.get_filter_favorite)
+router.post('/favorite/course', userController.get_filter_favorite)
 // router.delete('/favorite/delete/:id', favoriteValidation.by_id, userController.delete_favorite)
 
 //  ------  Premium User Routes  ------

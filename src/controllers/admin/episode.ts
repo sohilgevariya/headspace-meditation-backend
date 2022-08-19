@@ -208,7 +208,8 @@ export const add_night_episode = async (req: Request, res: Response) => {
 export const get_morning_episode = async (req: Request, res: Response) => {
     reqInfo(req);
     try {
-        let response: any = await episodeModel.find({ $or: [{ isMorning: 0 }, { isMorning: 1 }], isAfternoon: 0, isNight: 0, isActive: true }, { title: 1, isMorning: 1 })
+        // let response: any = await episodeModel.find({ $or: [{ isMorning: 0 }, { isMorning: 1 }], isAfternoon: 0, isNight: 0, isActive: true }, { title: 1, isMorning: 1 })
+        let response: any = await episodeModel.find({ isActive: true }, { title: 1, isMorning: 1 })
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("episode"), response))
     } catch (error) {
         console.log(error);
@@ -221,7 +222,8 @@ export const get_morning_episode = async (req: Request, res: Response) => {
 export const get_afternoon_episode = async (req: Request, res: Response) => {
     reqInfo(req);
     try {
-        let response: any = await episodeModel.find({ $or: [{ isAfternoon: 0 }, { isAfternoon: 1 }], isMorning: 0, isNight: 0, isActive: true }, { title: 1, isAfternoon: 1 })
+        // let response: any = await episodeModel.find({ $or: [{ isAfternoon: 0 }, { isAfternoon: 1 }], isMorning: 0, isNight: 0, isActive: true }, { title: 1, isAfternoon: 1 })
+        let response: any = await episodeModel.find({ isActive: true }, { title: 1, isAfternoon: 1 })
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("episode"), response))
     } catch (error) {
         console.log(error);
@@ -234,7 +236,8 @@ export const get_afternoon_episode = async (req: Request, res: Response) => {
 export const get_night_episode = async (req: Request, res: Response) => {
     reqInfo(req);
     try {
-        let response: any = await episodeModel.find({ $or: [{ isNight: 0 }, { isNight: 1 }], isAfternoon: 0, isMorning: 0, isActive: true }, { title: 1, isNight: 1 })
+        // let response: any = await episodeModel.find({ $or: [{ isNight: 0 }, { isNight: 1 }], isAfternoon: 0, isMorning: 0, isActive: true }, { title: 1, isNight: 1 })
+        let response: any = await episodeModel.find({ isActive: true }, { title: 1, isNight: 1 })
         return res.status(200).json(new apiResponse(200, responseMessage?.getDataSuccess("episode"), response))
     } catch (error) {
         console.log(error);

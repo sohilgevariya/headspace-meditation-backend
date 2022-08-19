@@ -229,7 +229,8 @@ exports.add_night_episode = add_night_episode;
 const get_morning_episode = async (req, res) => {
     (0, winston_logger_1.reqInfo)(req);
     try {
-        let response = await database_1.episodeModel.find({ $or: [{ isMorning: 0 }, { isMorning: 1 }], isAfternoon: 0, isNight: 0, isActive: true }, { title: 1, isMorning: 1 });
+        // let response: any = await episodeModel.find({ $or: [{ isMorning: 0 }, { isMorning: 1 }], isAfternoon: 0, isNight: 0, isActive: true }, { title: 1, isMorning: 1 })
+        let response = await database_1.episodeModel.find({ isActive: true }, { title: 1, isMorning: 1 });
         return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.getDataSuccess("episode"), response));
     }
     catch (error) {
@@ -243,7 +244,8 @@ exports.get_morning_episode = get_morning_episode;
 const get_afternoon_episode = async (req, res) => {
     (0, winston_logger_1.reqInfo)(req);
     try {
-        let response = await database_1.episodeModel.find({ $or: [{ isAfternoon: 0 }, { isAfternoon: 1 }], isMorning: 0, isNight: 0, isActive: true }, { title: 1, isAfternoon: 1 });
+        // let response: any = await episodeModel.find({ $or: [{ isAfternoon: 0 }, { isAfternoon: 1 }], isMorning: 0, isNight: 0, isActive: true }, { title: 1, isAfternoon: 1 })
+        let response = await database_1.episodeModel.find({ isActive: true }, { title: 1, isAfternoon: 1 });
         return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.getDataSuccess("episode"), response));
     }
     catch (error) {
@@ -257,7 +259,8 @@ exports.get_afternoon_episode = get_afternoon_episode;
 const get_night_episode = async (req, res) => {
     (0, winston_logger_1.reqInfo)(req);
     try {
-        let response = await database_1.episodeModel.find({ $or: [{ isNight: 0 }, { isNight: 1 }], isAfternoon: 0, isMorning: 0, isActive: true }, { title: 1, isNight: 1 });
+        // let response: any = await episodeModel.find({ $or: [{ isNight: 0 }, { isNight: 1 }], isAfternoon: 0, isMorning: 0, isActive: true }, { title: 1, isNight: 1 })
+        let response = await database_1.episodeModel.find({ isActive: true }, { title: 1, isNight: 1 });
         return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.getDataSuccess("episode"), response));
     }
     catch (error) {

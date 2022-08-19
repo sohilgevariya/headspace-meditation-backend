@@ -51,7 +51,7 @@ export const course_by_id_detail = async (req: Request, res: Response) => {
           title: 1,
           image: 1,
           description: 1,
-          isPremium: 1,
+          // isPremium: 1,
           isFavorite: {
             $cond: {
               if: { $in: [ObjectId(user?._id), "$favoriteBy.userId"] },
@@ -92,38 +92,38 @@ export const get_all_course = async (req: Request, res: Response) => {
   try {
     let response = await courseModel.aggregate([
       { $match: { isActive: true } },
-      // {
-      //   $lookup: {
-      //     from: "favorites",
-      //     let: { courseId: "$_id" },
-      //     pipeline: [
-      //       {
-      //         $match: {
-      //           $expr: {
-      //             $and: [
-      //               { $eq: ["$courseId", "$$courseId"] },
-      //               { $eq: ["$isActive", true] },
-      //             ],
-      //           },
-      //         },
-      //       },
-      //     ],
-      //     as: "favoriteBy",
-      //   },
-      // },
+      {
+        $lookup: {
+          from: "favorites",
+          let: { courseId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$courseId", "$$courseId"] },
+                    { $eq: ["$isActive", true] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "favoriteBy",
+        },
+      },
       {
         $project: {
           title: 1,
           image: 1,
           description: 1,
-          isPremium: 1,
-          // isFavorite: {
-          //   $cond: {
-          //     if: { $in: [ObjectId(user?._id), "$favoriteBy.userId"] },
-          //     then: true,
-          //     else: false,
-          //   },
-          // },
+          // isPremium: 1,
+          isFavorite: {
+            $cond: {
+              if: { $in: [ObjectId(user?._id), "$favoriteBy.userId"] },
+              then: true,
+              else: false,
+            },
+          },
         },
       },
       { $sort: { createdAt: -1 } },
@@ -199,7 +199,7 @@ export const get_all_course_pagination = async (
                 title: 1,
                 image: 1,
                 description: 1,
-                isPremium: 1,
+                // isPremium: 1,
                 isActive: 1,
                 createdAt: 1,
                 isFavorite: {
