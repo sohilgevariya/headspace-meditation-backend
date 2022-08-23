@@ -171,20 +171,20 @@ const get_episode_by_course = async (req, res) => {
 exports.get_episode_by_course = get_episode_by_course;
 const add_morning_episode = async (req, res) => {
     (0, winston_logger_1.reqInfo)(req);
-    let body = req.body;
+    let { episodeIds } = req.body;
     try {
-        let add_morning_meditation = await database_1.episodeModel.findOneAndUpdate({ _id: ObjectId(body?.episodeId), isActive: true }, { isMorning: 1 });
+        // let add_morning_meditation = await episodeModel.findOneAndUpdate({ _id: ObjectId(body?.episodeId), isActive: true }, { isMorning: 1 })
+        episodeIds = episodeIds.map(s => ObjectId(s));
+        let add_morning_meditation = await database_1.episodeModel.updateMany({ _id: { $in: episodeIds }, isActive: true }, { isMorning: 1 });
         if (add_morning_meditation) {
-            await database_1.episodeModel.updateMany({ _id: { $ne: ObjectId(body?.episodeId) }, isMorning: 1 }, { isMorning: 2 });
+            await database_1.episodeModel.updateMany({ _id: { $nin: episodeIds }, isMorning: 1 }, { isMorning: 2 });
             return res.status(200).json(new common_1.apiResponse(200, "Meditation added in morning", {}));
         }
         else
             return res.status(501).json(new common_1.apiResponse(501, helpers_1.responseMessage?.updateDataError('episode'), {}));
     }
     catch (error) {
-        return res
-            .status(500)
-            .json(new common_1.apiResponse(500, helpers_1.responseMessage?.internalServerError, error));
+        return res.status(500).json(new common_1.apiResponse(500, helpers_1.responseMessage?.internalServerError, error));
     }
 };
 exports.add_morning_episode = add_morning_episode;

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.get_profile = exports.update_profile = exports.Apple_SL = exports.facebook_SL = exports.google_SL = exports.user_logout = exports.generate_token = exports.change_password = exports.login = exports.signUp = void 0;
+exports.get_profile = exports.update_profile = exports.Apple_SL = exports.facebook_SL = exports.google_SL = exports.user_logout = exports.generate_token = exports.change_password = exports.resend_otp = exports.reset_password = exports.forgot_password = exports.otp_verification = exports.login = exports.signUp = void 0;
 const winston_logger_1 = require("../helpers/winston_logger");
 const database_1 = require("../database");
 const common_1 = require("../common");
@@ -13,6 +13,7 @@ const config_1 = __importDefault(require("config"));
 const axios_1 = __importDefault(require("axios"));
 const helpers_1 = require("../helpers");
 const async_1 = __importDefault(require("async"));
+const mail_1 = require("../helpers/mail");
 const ObjectId = require('mongoose').Types.ObjectId;
 const jwt_token_secret = config_1.default.get('jwt_token_secret');
 const refresh_jwt_token_secret = config_1.default.get('refresh_jwt_token_secret');
@@ -118,93 +119,128 @@ const login = async (req, res) => {
     }
 };
 exports.login = login;
-// export const otp_verification = async (req: Request, res: Response) => {
-//     reqInfo(req)
-//     let body = req.body
-//     try {
-//         body.isActive = true
-//         let data = await userModel.findOne(body)
-//         if (!data) return res.status(400).json(new apiResponse(400, responseMessage?.invalidOTP, {}));
-//         if (data.isBlock == true) return res.status(401).json(new apiResponse(401, responseMessage?.accountBlock, {}));
-//         if (new Date(data.otpExpireTime).getTime() < new Date().getTime()) return res.status(410).json(new apiResponse(410, responseMessage?.expireOTP, {}));
-//         if (!data?.isEmailVerified) {
-//             await userModel.updateOne(body, { isEmailVerified: true })
-//             return res.status(200).json(new apiResponse(200, responseMessage?.emailVerified, {}))
-//         }
-//         if (data) return res.status(200).json(new apiResponse(200, responseMessage?.OTPverified, { _id: data._id, otp: body.otp }));
-//     } catch (error) {
-//         console.log(error)
-//         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, error))
-//     }
-// }
-// export const forgot_password = async (req: Request, res: Response) => {
-//     reqInfo(req)
-//     let body = req.body,
-//         otpFlag = 1, // OTP has already assign or not for cross-verification
-//         otp = 0, response: any
-//     try {
-//         body.isActive = true
-//         let data = await userModel.findOne(body).select('email fullName isBlock isEmailVerified')
-//         if (!data) return res.status(400).json(new apiResponse(400, responseMessage?.invalidEmail, {}));
-//         if (data.isBlock == true) return res.status(401).json(new apiResponse(401, responseMessage?.accountBlock, {}));
-//         // if (data?.isEmailVerified == false) return res.status(502).json(new apiResponse(502, responseMessage?.emailUnverified, {}));
-//         while (otpFlag == 1) {
-//             for (let flag = 0; flag < 1;) {
-//                 otp = await Math.round(Math.random() * 1000000)
-//                 if (otp.toString().length == 6) {
-//                     flag++
-//                 }
-//             }
-//             let isAlreadyAssign = await userModel.findOne({ otp: otp })
-//             if (isAlreadyAssign?.otp != otp) otpFlag = 0
-//         }
-//         if (data?.isEmailVerified)
-//             response = await forgot_password_mail(data, otp).then(result => { return result }).catch(error => { return error })
-//         else
-//             response = await email_verification_mail(data, otp).then(result => { return result }).catch(error => { return error })
-//         if (response) {
-//             await userModel.findOneAndUpdate(body, { otp, otpExpireTime: new Date(new Date().setMinutes(new Date().getMinutes() + 10)) })
-//             return res.status(200).json(new apiResponse(200, `${response}`, {}));
-//         }
-//         else return res.status(501).json(new apiResponse(501, responseMessage?.errorMail, `${response}`));
-//     } catch (error) {
-//         console.log(error)
-//         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, error));
-//     }
-// }
-// export const reset_password = async (req: Request, res: Response) => {
-//     reqInfo(req)
-//     let body = req.body,
-//         authToken = 0,
-//         id = body.id,
-//         otp = body?.otp
-//     delete body.otp
-//     try {
-//         const salt = await bcryptjs.genSaltSync(10)
-//         const hashPassword = await bcryptjs.hash(body.password, salt)
-//         delete body.password
-//         delete body.id
-//         body.password = hashPassword
-//         for (let flag = 0; flag < 1;) {
-//             authToken = await Math.round(Math.random() * 1000000)
-//             if (authToken.toString().length == 6) {
-//                 flag++
-//             }
-//         }
-//         body.authToken = authToken
-//         body.otp = 0
-//         body.otpExpireTime = null
-//         let response = await userModel.findOneAndUpdate({ _id: ObjectId(id), isActive: true, otp: otp }, body, { new: true })
-//         if (response) {
-//             await setCache(response?._id, response, cachingTimeOut)
-//             return res.status(200).json(new apiResponse(200, responseMessage?.resetPasswordSuccess, { action: "please go to login page" }))
-//         }
-//         else return res.status(501).json(new apiResponse(501, responseMessage?.resetPasswordError, response))
-//     } catch (error) {
-//         console.log(error)
-//         return res.status(500).json(new apiResponse(500, responseMessage?.internalServerError, error))
-//     }
-// }
+const otp_verification = async (req, res) => {
+    (0, winston_logger_1.reqInfo)(req);
+    let body = req.body;
+    try {
+        body.isActive = true;
+        let data = await database_1.userModel.findOne(body);
+        if (!data)
+            return res.status(400).json(new common_1.apiResponse(400, helpers_1.responseMessage?.invalidOTP, {}));
+        if (data.isBlock == true)
+            return res.status(401).json(new common_1.apiResponse(401, helpers_1.responseMessage?.accountBlock, {}));
+        if (new Date(data.otpExpireTime).getTime() < new Date().getTime())
+            return res.status(410).json(new common_1.apiResponse(410, helpers_1.responseMessage?.expireOTP, {}));
+        if (data)
+            return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.OTPverified, { _id: data._id, otp: body.otp }));
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(new common_1.apiResponse(500, helpers_1.responseMessage?.internalServerError, error));
+    }
+};
+exports.otp_verification = otp_verification;
+const forgot_password = async (req, res) => {
+    (0, winston_logger_1.reqInfo)(req);
+    let body = req.body, otpFlag = 1, // OTP has already assign or not for cross-verification
+    otp = 0, response;
+    try {
+        body.isActive = true;
+        let data = await database_1.userModel.findOne(body).select('email firstName lastName');
+        if (!data)
+            return res.status(400).json(new common_1.apiResponse(400, helpers_1.responseMessage?.invalidEmail, {}));
+        if (data.isBlock == true)
+            return res.status(401).json(new common_1.apiResponse(401, helpers_1.responseMessage?.accountBlock, {}));
+        while (otpFlag == 1) {
+            for (let flag = 0; flag < 1;) {
+                otp = await Math.round(Math.random() * 1000000);
+                if (otp.toString().length == 6) {
+                    flag++;
+                }
+            }
+            let isAlreadyAssign = await database_1.userModel.findOne({ otp: otp });
+            if (isAlreadyAssign?.otp != otp)
+                otpFlag = 0;
+        }
+        response = await (0, mail_1.forgot_password_mail)(data, otp).then(result => { return result; }).catch(error => { return error; });
+        if (response) {
+            await database_1.userModel.findOneAndUpdate(body, { otp, otpExpireTime: new Date(new Date().setMinutes(new Date().getMinutes() + 10)) });
+            return res.status(200).json(new common_1.apiResponse(200, `${response}`, {}));
+        }
+        else
+            return res.status(501).json(new common_1.apiResponse(501, helpers_1.responseMessage?.errorMail, `${response}`));
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(new common_1.apiResponse(500, helpers_1.responseMessage?.internalServerError, error));
+    }
+};
+exports.forgot_password = forgot_password;
+const reset_password = async (req, res) => {
+    (0, winston_logger_1.reqInfo)(req);
+    let body = req.body, authToken = 0, id = body.id, otp = body?.otp;
+    delete body.otp;
+    try {
+        const salt = await bcryptjs_1.default.genSaltSync(10);
+        const hashPassword = await bcryptjs_1.default.hash(body.password, salt);
+        delete body.password;
+        delete body.id;
+        body.password = hashPassword;
+        for (let flag = 0; flag < 1;) {
+            authToken = await Math.round(Math.random() * 1000000);
+            if (authToken.toString().length == 6) {
+                flag++;
+            }
+        }
+        body.authToken = authToken;
+        body.otp = 0;
+        body.otpExpireTime = null;
+        let response = await database_1.userModel.findOneAndUpdate({ _id: ObjectId(id), isActive: true, otp: otp }, body, { new: true });
+        if (response) {
+            return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.resetPasswordSuccess, { action: "please go to login page" }));
+        }
+        else
+            return res.status(501).json(new common_1.apiResponse(501, helpers_1.responseMessage?.resetPasswordError, response));
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(new common_1.apiResponse(500, helpers_1.responseMessage?.internalServerError, error));
+    }
+};
+exports.reset_password = reset_password;
+const resend_otp = async (req, res) => {
+    (0, winston_logger_1.reqInfo)(req);
+    let { email } = req.body, otpFlag = 1, // OTP has already assign or not for cross-verification
+    otp = 0, response;
+    try {
+        let data = await database_1.userModel.findOne({ email, isActive: true });
+        if (!data)
+            return res.status(400).json(new common_1.apiResponse(400, helpers_1.responseMessage.invalidEmail, {}));
+        while (otpFlag == 1) {
+            for (let flag = 0; flag < 1;) {
+                otp = await Math.round(Math.random() * 1000000);
+                if (otp.toString().length == 6) {
+                    flag++;
+                }
+            }
+            let isAlreadyAssign = await database_1.userModel.findOne({ otp: otp });
+            if (isAlreadyAssign?.otp != otp)
+                otpFlag = 0;
+        }
+        response = await (0, mail_1.forgot_password_mail)(data, otp);
+        if (response) {
+            await database_1.userModel.findOneAndUpdate({ email, isActive: true }, { otp });
+            return res.status(200).json(new common_1.apiResponse(200, `${response}`, {}));
+        }
+        else
+            return res.status(501).json(new common_1.apiResponse(501, helpers_1.responseMessage.errorMail, {}));
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json(new common_1.apiResponse(500, helpers_1.responseMessage.internalServerError, {}));
+    }
+};
+exports.resend_otp = resend_otp;
 const change_password = async (req, res) => {
     (0, winston_logger_1.reqInfo)(req);
     let user = req.header('user'), { old_password, new_password } = req.body, authToken;
@@ -619,7 +655,7 @@ const get_profile = async (req, res) => {
     (0, winston_logger_1.reqInfo)(req);
     let user = req.header('user'), response;
     try {
-        response = await database_1.userModel.findOne({ _id: ObjectId(user._id), isActive: true }).select('name image email isUserPremium isActive isBlock');
+        response = await database_1.userModel.findOne({ _id: ObjectId(user._id), isActive: true });
         if (response)
             return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage.getDataSuccess('Your profile'), response));
         else

@@ -16,10 +16,6 @@ const dashboard = async (req, res) => {
                         { $match: { isMorning: 1, isActive: true } },
                         { $project: { title: 1, image: 1, description: 1, audioOrVideo: 1 } }
                     ],
-                    // morning: [
-                    //     { $match: { isMorning: 1, isActive: true } },
-                    //     { $project: { title: 1, image: 1, description: 1, audioOrVideo: 1 } }
-                    // ],
                     afternoonLift: [
                         { $match: { isAfternoon: 1, isActive: true } },
                         { $project: { title: 1, image: 1, description: 1, audioOrVideo: 1 } }

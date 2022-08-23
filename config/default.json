@@ -1,18 +1,23 @@
 {
-    "db_url": "mongodb+srv://Sohilgevariya:sohil7268@cluster0.qy0dw.mongodb.net/headspace_meditation",
-    "jwt_token_secret": "seCr3t-D_|-AsdSEF_He@d$p@ce&O*L!DE%R^&@-enc-kEY",
-    "refresh_jwt_token_secret": "seCr3t-D_|-AsdSEFHEAD&O*L!DE%R^&@-enc-kEY",
-    "Winston": {
-        "level": "debug"
-    },
-    "timeZone": "Asia/Calcutta",
-    "google_api_key": "AIzaSyD5ZFP7_BBjvcyqgzz0SAEHHFOJCTmkcNs",
-    "aws": {
-        "accessKeyId": "AKIARYJFCPMFL3XJAEVU",
-        "secretAccessKey": "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",
-        "region": "eu-west-2",
-        "bucket_name": "headspace-meditation",
-        "bucket_url": "https://headspace-meditation.s3.eu-west-2.amazonaws.com"
-    },
-    "fcmKey": ""
+  "db_url": "mongodb+srv://Sohilgevariya:sohil7268@cluster0.qy0dw.mongodb.net/headspace_meditation",
+  "jwt_token_secret": "seCr3t-D_|-AsdSEF_He@d$p@ce&O*L!DE%R^&@-enc-kEY",
+  "refresh_jwt_token_secret": "seCr3t-D_|-AsdSEFHEAD&O*L!DE%R^&@-enc-kEY",
+  "Winston": {
+    "level": "debug"
+  },
+  "timeZone": "Asia/Calcutta",
+  "google_api_key": "AIzaSyD5ZFP7_BBjvcyqgzz0SAEHHFOJCTmkcNs",
+  "aws": {
+    "accessKeyId": "AKIARYJFCPMFL3XJAEVU",
+    "secretAccessKey": "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",
+    "region": "eu-west-2",
+    "bucket_name": "headspace-meditation",
+    "bucket_url": "https://headspace-meditation.s3.eu-west-2.amazonaws.com"
+  },
+  "nodeMail": {
+    "mail": "sohilgevariya2000@gmail.com",
+    "password": "evzahkewlmbdvbib",
+    "service": "gmail"
+  },
+  "fcmKey": ""
 }

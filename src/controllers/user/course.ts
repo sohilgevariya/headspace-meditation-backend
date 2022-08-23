@@ -236,3 +236,79 @@ export const get_all_course_pagination = async (
       .json(new apiResponse(500, responseMessage?.internalServerError, {}));
   }
 };
+
+export const get_category_wise_course = async (req: Request, res: Response) => {
+  reqInfo(req);
+  let { page, limit, search, categoryId } = req.body
+  let user: any = req.header("user");
+  try {
+    // let response: any = await courseModel.find({ categoryId: ObjectId(req.params.id), isActive: true })
+    let response: any = await courseModel.aggregate([
+      { $match: { categoryId: ObjectId(categoryId), isActive: true } },
+      {
+        $lookup: {
+          from: "favorites",
+          let: { courseId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$courseId", "$$courseId"] },
+                    { $eq: ["$isActive", true] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "favoriteBy",
+        },
+      },
+      {
+        $facet: {
+          data: [
+            { $sort: { createdAt: -1 } },
+            { $skip: (((page as number) - 1) * limit) as number },
+            { $limit: limit as number },
+            {
+              $project: {
+                title: 1,
+                image: 1,
+                description: 1,
+                // isPremium: 1,
+                isActive: 1,
+                createdAt: 1,
+                isFavorite: {
+                  $cond: {
+                    if: { $in: [ObjectId(user?._id), "$favoriteBy.userId"] },
+                    then: true,
+                    else: false,
+                  },
+                },
+              },
+            },
+          ],
+          data_count: [{ $count: "count" }],
+        },
+      },
+    ])
+    return res.status(200).json(
+      new apiResponse(200, responseMessage?.getDataSuccess("course"), {
+        course_data: response[0]?.data,
+        state: {
+          page: req.body?.page,
+          limit: req.body?.limit,
+          page_limit:
+            Math.ceil(
+              (response[0]?.data_count[0]?.count / req.body?.limit) as number
+            ) || 1,
+        },
+      })
+    );
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json(new apiResponse(500, responseMessage?.internalServerError, {}));
+  }
+};

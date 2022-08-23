@@ -54,8 +54,7 @@ export const by_id = async (req: Request, res: Response, next: any) => {
 
 export const forgot_password = async (req: Request, res: Response, next: any) => {
     const schema = Joi.object({
-        email: Joi.string().trim().lowercase().trim().max(50).error(new Error('email is string! & max length is 50')),
-        phoneNumber: Joi.string().trim().trim().error(new Error('phoneNumber is string!')),
+        email: Joi.string().error(new Error('email is string! & max length is 50')),
     })
     schema.validateAsync(req.body).then(result => {
         req.body = result
@@ -95,7 +94,6 @@ export const otp_verification = async (req: Request, res: Response, next: any) =
 export const resend_otp = async (req: Request, res: Response, next: any) => {
     const schema = Joi.object({
         email: Joi.string().trim().error(new Error('email is string! ')),
-        phoneNumber: Joi.string().trim().error(new Error('phoneNumber is string!')),
     })
     schema.validateAsync(req.body).then(result => {
         req.body = result
