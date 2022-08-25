@@ -1,10 +1,9 @@
 "use strict"
 import { reqInfo } from '../../helpers/winston_logger'
-import { favoriteModel, episodeModel } from '../../database'
-import { adminDeleteAction, apiResponse, emailTemplates, storeStatus, URL_decode } from '../../common'
+import { episodeModel } from '../../database'
+import { apiResponse } from '../../common'
 import { Request, Response } from 'express'
 import mongoose from 'mongoose'
-import { deleteImage } from '../../helpers/S3'
 import { responseMessage } from '../../helpers'
 
 const ObjectId = mongoose.Types.ObjectId
