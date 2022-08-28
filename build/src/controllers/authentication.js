@@ -635,13 +635,13 @@ const update_profile = async (req, res) => {
     let body = req.body, id = body?.id, user = req.header('user');
     body.updatedBy = user._id;
     try {
-        let response = await database_1.userModel.findOneAndUpdate({ _id: ObjectId(req.header('user')?._id), isActive: true, userType: common_1.userStatus.user }, body);
+        let response = await database_1.userModel.findOneAndUpdate({ _id: ObjectId(req.header('user')?._id), isActive: true, userType: common_1.userStatus.user }, body, { new: true });
         if (response) {
             if (body?.image != response?.image && response.image != null && body?.image != null && body?.image != undefined) {
                 let [folder_name, image_name] = await (0, common_1.URL_decode)(response?.image);
                 await (0, helpers_1.deleteImage)(image_name, folder_name);
             }
-            return res.status(200).json(new common_1.apiResponse(200, 'Profile updated successfully', {}));
+            return res.status(200).json(new common_1.apiResponse(200, 'Profile updated successfully', response));
         }
         else
             return res.status(404).json(new common_1.apiResponse(404, 'Database error while updating profile', {}));

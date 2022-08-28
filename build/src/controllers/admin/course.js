@@ -259,8 +259,12 @@ const delete_course = async (req, res) => {
                 let [folder_name, image_name] = await (0, common_1.URL_decode)(response?.image);
                 await (0, S3_1.deleteImage)(image_name, folder_name);
             }
-            // await favoriteModel.findOneAndDelete({
-            //     courseId: ObjectId(id),
+            await database_1.favoriteModel.deleteMany({
+                courseId: ObjectId(id),
+                isActive: true,
+            });
+            // await exploreModel.deleteMany({
+            //     courseList: { $in: [ObjectId(id)] },
             //     isActive: true,
             // });
             return res

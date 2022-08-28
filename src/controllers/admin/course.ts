@@ -1,6 +1,6 @@
 "use strict";
 import { reqInfo } from "../../helpers/winston_logger";
-import { favoriteModel, courseModel } from "../../database";
+import { favoriteModel, courseModel, exploreModel } from "../../database";
 import {
     adminDeleteAction,
     apiResponse,
@@ -287,8 +287,12 @@ export const delete_course = async (req: Request, res: Response) => {
                 let [folder_name, image_name] = await URL_decode(response?.image);
                 await deleteImage(image_name, folder_name);
             }
-            // await favoriteModel.findOneAndDelete({
-            //     courseId: ObjectId(id),
+            await favoriteModel.deleteMany({
+                courseId: ObjectId(id),
+                isActive: true,
+            });
+            // await exploreModel.deleteMany({
+            //     courseList: { $in: [ObjectId(id)] },
             //     isActive: true,
             // });
             return res

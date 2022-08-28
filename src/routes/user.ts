@@ -44,6 +44,10 @@ router.post('/favorite/course', userController.get_filter_favorite)
 router.get('/category', adminController?.get_category)
 router.get('/category/:id', categoryValidation?.by_id, adminController?.category_by_id)
 
+//  ------- Feature and Explore Data Routes --------
+router.get('/category/featured/:id', categoryValidation?.by_id, userController?.get_featured_category_course)
+router.get('/category/explore/:id', categoryValidation?.by_id, userController?.get_explore_category_course)
+
 
 //  ------  Premium User Routes  ------
 router.put('/premium/add', adminController.user_premium)

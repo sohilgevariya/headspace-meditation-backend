@@ -41,6 +41,9 @@ router.post('/favorite/add', validation_1.favoriteValidation.add, controllers_1.
 router.post('/favorite/course', controllers_1.userController.get_filter_favorite);
 router.get('/category', controllers_1.adminController?.get_category);
 router.get('/category/:id', validation_1.categoryValidation?.by_id, controllers_1.adminController?.category_by_id);
+//  ------- Feature and Explore Data Routes --------
+router.get('/category/featured/:id', validation_1.categoryValidation?.by_id, controllers_1.userController?.get_featured_category_course);
+router.get('/category/explore/:id', validation_1.categoryValidation?.by_id, controllers_1.userController?.get_explore_category_course);
 //  ------  Premium User Routes  ------
 router.put('/premium/add', controllers_1.adminController.user_premium);
 exports.userRouter = router;
