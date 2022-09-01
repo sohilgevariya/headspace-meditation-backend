@@ -5,7 +5,6 @@ import { adminDeleteAction, apiResponse, userStatus } from '../../common'
 import { Request, Response } from 'express'
 import mongoose from 'mongoose'
 import { deleteImage } from '../../helpers/S3'
-import { responseMessage } from '../../helpers'
 
 export const dashboard = async (req: Request, res: Response) => {
     reqInfo(req)
