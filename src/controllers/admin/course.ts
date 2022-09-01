@@ -70,12 +70,12 @@ export const update_course = async (req: Request, res: Response) => {
             body
         );
         if (response) {
-            if (response.image != null) {
-                if (response.image != body?.image) {
-                    let [folder_name, image_name] = await URL_decode(response?.image);
-                    await deleteImage(image_name, folder_name);
-                }
-            }
+            // if (response.image != null) {
+            //     if (response.image != body?.image) {
+            //         let [folder_name, image_name] = await URL_decode(response?.image);
+            //         await deleteImage(image_name, folder_name);
+            //     }
+            // }
             return res
                 .status(200)
                 .json(
@@ -283,10 +283,10 @@ export const delete_course = async (req: Request, res: Response) => {
         // let response = await courseModel.findOneAndUpdate({ _id: ObjectId(id), isActive: true }, { isActive: false })
         let response = await courseModel.findByIdAndDelete({ _id: ObjectId(id) });
         if (response) {
-            if (response.image != null || response.image != "") {
-                let [folder_name, image_name] = await URL_decode(response?.image);
-                await deleteImage(image_name, folder_name);
-            }
+            // if (response.image != null || response.image != "") {
+            //     let [folder_name, image_name] = await URL_decode(response?.image);
+            //     await deleteImage(image_name, folder_name);
+            // }
             await favoriteModel.deleteMany({
                 courseId: ObjectId(id),
                 isActive: true,

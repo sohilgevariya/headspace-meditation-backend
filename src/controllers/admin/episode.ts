@@ -38,12 +38,12 @@ export const update_episode = async (req: Request, res: Response) => {
         delete body?.episodeId
         let response = await episodeModel.findOneAndUpdate({ _id: ObjectId(episodeId), isActive: true }, body)
         if (response) {
-            if (response.audioOrVideo != null) {
-                if (response.audioOrVideo != body?.audioOrVideo) {
-                    let [folder_name, audioOrVideo_name] = await URL_decode(response?.audioOrVideo)
-                    await deleteImage(audioOrVideo_name, folder_name)
-                }
-            }
+            // if (response.audioOrVideo != null) {
+            //     if (response.audioOrVideo != body?.audioOrVideo) {
+            //         let [folder_name, audioOrVideo_name] = await URL_decode(response?.audioOrVideo)
+            //         await deleteImage(audioOrVideo_name, folder_name)
+            //     }
+            // }
             return res.status(200).json(new apiResponse(200, responseMessage?.updateDataSuccess('episode'), {}))
         }
         else return res.status(400).json(new apiResponse(400, responseMessage?.getDataNotFound('episode'), {}))

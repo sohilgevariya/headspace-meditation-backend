@@ -70,12 +70,12 @@ export const update_explore = async (req: Request, res: Response) => {
             body
         );
         if (response) {
-            if (response.image != null) {
-                if (response.image != body?.image) {
-                    let [folder_name, image_name] = await URL_decode(response?.image);
-                    await deleteImage(image_name, folder_name);
-                }
-            }
+            // if (response.image != null) {
+            //     if (response.image != body?.image) {
+            //         let [folder_name, image_name] = await URL_decode(response?.image);
+            //         await deleteImage(image_name, folder_name);
+            //     }
+            // }
             return res
                 .status(200)
                 .json(

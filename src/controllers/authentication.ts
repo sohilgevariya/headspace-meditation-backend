@@ -631,10 +631,10 @@ export const update_profile = async (req: Request, res: Response) => {
     try {
         let response = await userModel.findOneAndUpdate({ _id: ObjectId((req.header('user') as any)?._id), isActive: true, userType: userStatus.user }, body, { new: true })
         if (response) {
-            if (body?.image != response?.image && response.image != null && body?.image != null && body?.image != undefined) {
-                let [folder_name, image_name] = await URL_decode(response?.image)
-                await deleteImage(image_name, folder_name)
-            }
+            // if (body?.image != response?.image && response.image != null && body?.image != null && body?.image != undefined) {
+            //     let [folder_name, image_name] = await URL_decode(response?.image)
+            //     await deleteImage(image_name, folder_name)
+            // }
             return res.status(200).json(new apiResponse(200, 'Profile updated successfully', response))
         }
         else return res.status(404).json(new apiResponse(404, 'Database error while updating profile', {}))

@@ -8,7 +8,6 @@ const winston_logger_1 = require("../../helpers/winston_logger");
 const database_1 = require("../../database");
 const common_1 = require("../../common");
 const mongoose_1 = __importDefault(require("mongoose"));
-const S3_1 = require("../../helpers/S3");
 const helpers_1 = require("../../helpers");
 const ObjectId = mongoose_1.default.Types.ObjectId;
 const add_episode = async (req, res) => {
@@ -40,12 +39,12 @@ const update_episode = async (req, res) => {
         delete body?.episodeId;
         let response = await database_1.episodeModel.findOneAndUpdate({ _id: ObjectId(episodeId), isActive: true }, body);
         if (response) {
-            if (response.audioOrVideo != null) {
-                if (response.audioOrVideo != body?.audioOrVideo) {
-                    let [folder_name, audioOrVideo_name] = await (0, common_1.URL_decode)(response?.audioOrVideo);
-                    await (0, S3_1.deleteImage)(audioOrVideo_name, folder_name);
-                }
-            }
+            // if (response.audioOrVideo != null) {
+            //     if (response.audioOrVideo != body?.audioOrVideo) {
+            //         let [folder_name, audioOrVideo_name] = await URL_decode(response?.audioOrVideo)
+            //         await deleteImage(audioOrVideo_name, folder_name)
+            //     }
+            // }
             return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.updateDataSuccess('episode'), {}));
         }
         else

@@ -637,10 +637,10 @@ const update_profile = async (req, res) => {
     try {
         let response = await database_1.userModel.findOneAndUpdate({ _id: ObjectId(req.header('user')?._id), isActive: true, userType: common_1.userStatus.user }, body, { new: true });
         if (response) {
-            if (body?.image != response?.image && response.image != null && body?.image != null && body?.image != undefined) {
-                let [folder_name, image_name] = await (0, common_1.URL_decode)(response?.image);
-                await (0, helpers_1.deleteImage)(image_name, folder_name);
-            }
+            // if (body?.image != response?.image && response.image != null && body?.image != null && body?.image != undefined) {
+            //     let [folder_name, image_name] = await URL_decode(response?.image)
+            //     await deleteImage(image_name, folder_name)
+            // }
             return res.status(200).json(new common_1.apiResponse(200, 'Profile updated successfully', response));
         }
         else
