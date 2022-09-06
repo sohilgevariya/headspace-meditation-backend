@@ -88,7 +88,7 @@ const user_premium = async (req, res) => {
     (0, winston_logger_1.reqInfo)(req);
     let user = req.header('user'), body = req.body, response;
     try {
-        response = await database_1.userModel.findOneAndUpdate({ _id: ObjectId(body?.userId), isActive: true }, { isUserPremium: true }, { new: true }).select('name image isUserPremium email userType loginType isBlock');
+        response = await database_1.userModel.findOneAndUpdate({ _id: ObjectId(body?.userId), isActive: true }, { isUserPremium: true }, { new: true }).select('firstName lastName image isUserPremium email mobileNumber userType loginType isBlock');
         if (response) {
             return res.status(200).json(new common_1.apiResponse(200, "success!", response));
         }

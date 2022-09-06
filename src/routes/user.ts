@@ -48,8 +48,10 @@ router.get('/category/:id', categoryValidation?.by_id, adminController?.category
 router.get('/category/featured/:id', categoryValidation?.by_id, userController?.get_featured_category_course)
 router.get('/category/explore/:id', categoryValidation?.by_id, userController?.get_explore_category_course)
 
-
 //  ------  Premium User Routes  ------
 router.put('/premium/add', adminController.user_premium)
+
+// ------  Notification Routes  -------
+router.get('/notification', userController?.get_notification)
 
 export const userRouter = router

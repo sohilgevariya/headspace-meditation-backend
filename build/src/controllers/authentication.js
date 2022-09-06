@@ -178,8 +178,7 @@ const forgot_password = async (req, res) => {
 exports.forgot_password = forgot_password;
 const reset_password = async (req, res) => {
     (0, winston_logger_1.reqInfo)(req);
-    let body = req.body, authToken = 0, id = body.id, otp = body?.otp;
-    delete body.otp;
+    let body = req.body, authToken = 0, id = body.id;
     try {
         const salt = await bcryptjs_1.default.genSaltSync(10);
         const hashPassword = await bcryptjs_1.default.hash(body.password, salt);
@@ -193,9 +192,8 @@ const reset_password = async (req, res) => {
             }
         }
         body.authToken = authToken;
-        body.otp = 0;
         body.otpExpireTime = null;
-        let response = await database_1.userModel.findOneAndUpdate({ _id: ObjectId(id), isActive: true, otp: otp }, body, { new: true });
+        let response = await database_1.userModel.findOneAndUpdate({ _id: ObjectId(id), isActive: true }, body, { new: true });
         if (response) {
             return res.status(200).json(new common_1.apiResponse(200, helpers_1.responseMessage?.resetPasswordSuccess, { action: "please go to login page" }));
         }

@@ -66,5 +66,7 @@ router.get('/explore/category/:id', validation_1.exploreValidation.by_id, contro
 router.put('/explore/course/add', validation_1.exploreValidation.add_explore_course, controllers_1.adminController.add_explore_course);
 router.get('/explore/course/:id', validation_1.exploreValidation.by_id, controllers_1.adminController.get_course_explore_wise);
 router.delete('/explore/:id', validation_1.exploreValidation.by_id, controllers_1.adminController.delete_explore);
+// ------  Notification Routes  -------
+router.post('/notification/add', controllers_1.adminController?.add_notification);
 exports.adminRouter = router;
 //# sourceMappingURL=admin.js.map

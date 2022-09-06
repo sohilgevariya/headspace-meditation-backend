@@ -1,7 +1,7 @@
 "use strict";
 var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.notificationTemplate = exports.reactionValue = exports.reactionArray = exports.file_path = exports.not_first_one = exports.URL_decode = exports.commonStatus = exports.commonCacheKey = exports.adminDeleteAction = exports.userStatus = exports.storeStatus = exports.loginType = exports.emailTemplates = exports.cacheKeyName = exports.getArea = exports.commentLimit = exports.cachingTimeOut = exports.apiResponse = void 0;
+exports.notification_types = exports.file_path = exports.not_first_one = exports.URL_decode = exports.commonStatus = exports.commonCacheKey = exports.adminDeleteAction = exports.userStatus = exports.storeStatus = exports.loginType = exports.emailTemplates = exports.cacheKeyName = exports.getArea = exports.commentLimit = exports.cachingTimeOut = exports.apiResponse = void 0;
 class apiResponse {
     constructor(status, message, data) {
         this.status = status;
@@ -100,37 +100,15 @@ const not_first_one = (a1, a2) => {
     return diff;
 };
 exports.not_first_one = not_first_one;
-exports.file_path = ['profile', 'course', 'episode', 'video', 'explore'];
-exports.reactionArray = ['smile', 'sad', 'angry', 'heart'];
-exports.reactionValue = { heart: 4, smile: 3, sad: 2, angry: 1 };
-exports.notificationTemplate = {
-    comment: (data) => {
+exports.file_path = ['profile', 'course', 'episode', 'video', 'explore', 'notification'];
+exports.notification_types = {
+    add_notification: async (data) => {
         return {
             template: {
-                title: `New comment`, body: `${data?.fullName} commented on your review`
+                title: `${data.title}`, body: `${data.image} ${data.description}`
             },
             data: {
-                type: 0, reviewId: data?.reviewId, storeId: data?.storeId, commentId: data?.commentId, click_action: "FLUTTER_NOTIFICATION_CLICK",
-            }
-        };
-    },
-    store_comment: (data) => {
-        return {
-            template: {
-                title: `New comment`, body: `${data?.fullName} commented on your store review`
-            },
-            data: {
-                type: 0, reviewId: data?.reviewId, storeId: data?.storeId, commentId: data?.commentId, click_action: "FLUTTER_NOTIFICATION_CLICK",
-            }
-        };
-    },
-    review: (data) => {
-        return {
-            template: {
-                title: `New Review`, body: `${data?.fullName} reviewed on your store`
-            },
-            data: {
-                type: 1, reviewId: data?.reviewId, storeId: data?.storeId, click_action: "FLUTTER_NOTIFICATION_CLICK",
+                type: 0, image: data.image, description: data.description, title: data.title,
             }
         };
     },

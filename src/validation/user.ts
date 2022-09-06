@@ -11,6 +11,7 @@ export const signUp = async (req: Request, res: Response, next: any) => {
         firstName: Joi.string().trim().required().trim().error(new Error('firstName is required!')),
         lastName: Joi.string().allow("").trim().required().trim().error(new Error('lastName is required!')),
         password: Joi.string().trim().required().trim().error(new Error('password is required!')),
+        mobileNumber: Joi.string().allow("", null).error(new Error('mobileNumber is string!')),
         // userType: Joi.number().error(new Error('userType is number')),
     })
     schema.validateAsync(req.body).then(result => {
@@ -68,7 +69,7 @@ export const reset_password = async (req: Request, res: Response, next: any) => 
     const schema = Joi.object({
         id: Joi.string().trim().trim().required().error(new Error('id is required!')),
         password: Joi.string().trim().trim().max(20).required().error(new Error('password is required! & max length is 20')),
-        otp: Joi.number().required().error(new Error('otp is required!')),
+        // otp: Joi.number().required().error(new Error('otp is required!')),
     })
     schema.validateAsync(req.body).then(result => {
         if (!isValidObjectId(result.id)) return res.status(400).json(new apiResponse(400, 'invalid id', {}))

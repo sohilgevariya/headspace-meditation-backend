@@ -1,7 +1,7 @@
 "use strict"
 import { reqInfo } from '../../helpers/winston_logger'
 import { favoriteModel, episodeModel } from '../../database'
-import { adminDeleteAction, apiResponse, emailTemplates, storeStatus, URL_decode } from '../../common'
+import { apiResponse, URL_decode } from '../../common'
 import { Request, Response } from 'express'
 import mongoose from 'mongoose'
 import { deleteImage } from '../../helpers/S3'

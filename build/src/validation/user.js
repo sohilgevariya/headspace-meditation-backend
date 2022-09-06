@@ -30,6 +30,7 @@ const signUp = async (req, res, next) => {
         firstName: Joi.string().trim().required().trim().error(new Error('firstName is required!')),
         lastName: Joi.string().allow("").trim().required().trim().error(new Error('lastName is required!')),
         password: Joi.string().trim().required().trim().error(new Error('password is required!')),
+        mobileNumber: Joi.string().allow("", null).error(new Error('mobileNumber is string!')),
         // userType: Joi.number().error(new Error('userType is number')),
     });
     schema.validateAsync(req.body).then(result => {
@@ -88,7 +89,7 @@ const reset_password = async (req, res, next) => {
     const schema = Joi.object({
         id: Joi.string().trim().trim().required().error(new Error('id is required!')),
         password: Joi.string().trim().trim().max(20).required().error(new Error('password is required! & max length is 20')),
-        otp: Joi.number().required().error(new Error('otp is required!')),
+        // otp: Joi.number().required().error(new Error('otp is required!')),
     });
     schema.validateAsync(req.body).then(result => {
         if (!(0, mongoose_1.isValidObjectId)(result.id))

@@ -6,7 +6,7 @@ const database_1 = require("../../database");
 const common_1 = require("../../common");
 const dashboard = async (req, res) => {
     (0, winston_logger_1.reqInfo)(req);
-    let user = req.header('user');
+    let user = req.header('user'), response = [];
     try {
         let getEpisodeData = await database_1.episodeModel.aggregate([
             { $match: { isActive: true } },
@@ -27,7 +27,9 @@ const dashboard = async (req, res) => {
                 }
             }
         ]);
-        return res.status(200).json(new common_1.apiResponse(200, `Get user dashboard successfully`, getEpisodeData));
+        let getRandomData = await database_1.episodeModel.aggregate([{ $match: { isActive: true, isAfternoon: { $ne: 1 }, isNight: { $ne: 1 } } }, { $sample: { size: 1 } }, { $project: { title: 1, image: 1, description: 1, audioOrVideo: 1 } }]);
+        let data = [...getEpisodeData, getEpisodeData[0]?.startYourDay?.push(getRandomData?.[0])];
+        return res.status(200).json(new common_1.apiResponse(200, `Get user dashboard successfully`, data));
     }
     catch (error) {
         return res.status(500).json(new common_1.apiResponse(500, 'Internal server error', {}));

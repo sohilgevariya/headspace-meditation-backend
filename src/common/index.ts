@@ -107,40 +107,16 @@ export const not_first_one = (a1: Array<any>, a2: Array<any>) => {
     return diff;
 }
 
-export const file_path = ['profile', 'course', 'episode', 'video', 'explore']
+export const file_path = ['profile', 'course', 'episode', 'video', 'explore', 'notification']
 
-export const reactionArray = ['smile', 'sad', 'angry', 'heart']
-
-export const reactionValue = { heart: 4, smile: 3, sad: 2, angry: 1 }
-
-export const notificationTemplate = {
-    comment: (data: any) => {
+export const notification_types = {
+    add_notification: async (data: any) => {
         return {
             template: {
-                title: `New comment`, body: `${data?.fullName} commented on your review`
+                title: `${data.title}`, body: `${data.image} ${data.description}`
             },
             data: {
-                type: 0, reviewId: data?.reviewId, storeId: data?.storeId, commentId: data?.commentId, click_action: "FLUTTER_NOTIFICATION_CLICK",
-            }
-        }
-    },
-    store_comment: (data: any) => {
-        return {
-            template: {
-                title: `New comment`, body: `${data?.fullName} commented on your store review`
-            },
-            data: {
-                type: 0, reviewId: data?.reviewId, storeId: data?.storeId, commentId: data?.commentId, click_action: "FLUTTER_NOTIFICATION_CLICK",
-            }
-        }
-    },
-    review: (data: any) => {
-        return {
-            template: {
-                title: `New Review`, body: `${data?.fullName} reviewed on your store`
-            },
-            data: {
-                type: 1, reviewId: data?.reviewId, storeId: data?.storeId, click_action: "FLUTTER_NOTIFICATION_CLICK",
+                type: 0, image: data.image, description: data.description, title: data.title,
             }
         }
     },

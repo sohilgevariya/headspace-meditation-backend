@@ -15,4 +15,5 @@ __exportStar(require("./course"), exports);
 __exportStar(require("./episode"), exports);
 __exportStar(require("./homePage"), exports);
 __exportStar(require("./category"), exports);
+__exportStar(require("./notification"), exports);
 //# sourceMappingURL=index.js.map

@@ -17,4 +17,5 @@ __exportStar(require("./favorite"), exports);
 __exportStar(require("./episode"), exports);
 __exportStar(require("./category"), exports);
 __exportStar(require("./explore"), exports);
+__exportStar(require("./notification"), exports);
 //# sourceMappingURL=index.js.map

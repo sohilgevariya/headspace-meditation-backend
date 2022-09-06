@@ -87,7 +87,7 @@ export const user_premium = async (req: Request, res: Response) => {
         body: any = req.body,
         response: any
     try {
-        response = await userModel.findOneAndUpdate({ _id: ObjectId(body?.userId), isActive: true }, { isUserPremium: true }, { new: true }).select('name image isUserPremium email userType loginType isBlock')
+        response = await userModel.findOneAndUpdate({ _id: ObjectId(body?.userId), isActive: true }, { isUserPremium: true }, { new: true }).select('firstName lastName image isUserPremium email mobileNumber userType loginType isBlock')
         if (response) {
             return res.status(200).json(new apiResponse(200, "success!", response))
         }

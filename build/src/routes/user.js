@@ -46,5 +46,7 @@ router.get('/category/featured/:id', validation_1.categoryValidation?.by_id, con
 router.get('/category/explore/:id', validation_1.categoryValidation?.by_id, controllers_1.userController?.get_explore_category_course);
 //  ------  Premium User Routes  ------
 router.put('/premium/add', controllers_1.adminController.user_premium);
+// ------  Notification Routes  -------
+router.get('/notification', controllers_1.userController?.get_notification);
 exports.userRouter = router;
 //# sourceMappingURL=user.js.map

@@ -6,7 +6,7 @@ import { Request, Response } from 'express'
 
 export const dashboard = async (req: Request, res: Response) => {
     reqInfo(req)
-    let user: any = req.header('user')
+    let user: any = req.header('user'), response: any = []
     try {
         let getEpisodeData = await episodeModel.aggregate([
             { $match: { isActive: true } },
@@ -26,8 +26,11 @@ export const dashboard = async (req: Request, res: Response) => {
                     ]
                 }
             }
-        ])
-        return res.status(200).json(new apiResponse(200, `Get user dashboard successfully`, getEpisodeData))
+        ]);
+        let getRandomData = await episodeModel.aggregate([{ $match: { isActive: true, isAfternoon: { $ne: 1 }, isNight: { $ne: 1 } } }, { $sample: { size: 1 } }, { $project: { title: 1, image: 1, description: 1, audioOrVideo: 1 } }]);
+
+        let data = [...getEpisodeData, getEpisodeData[0]?.startYourDay?.push(getRandomData?.[0])]
+        return res.status(200).json(new apiResponse(200, `Get user dashboard successfully`, data))
     } catch (error) {
         return res.status(500).json(new apiResponse(500, 'Internal server error', {}))
     }

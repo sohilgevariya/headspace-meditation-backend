@@ -166,9 +166,7 @@ export const reset_password = async (req: Request, res: Response) => {
     reqInfo(req)
     let body = req.body,
         authToken = 0,
-        id = body.id,
-        otp = body?.otp
-    delete body.otp
+        id = body.id
     try {
         const salt = await bcryptjs.genSaltSync(10)
         const hashPassword = await bcryptjs.hash(body.password, salt)
@@ -183,9 +181,8 @@ export const reset_password = async (req: Request, res: Response) => {
             }
         }
         body.authToken = authToken
-        body.otp = 0
         body.otpExpireTime = null
-        let response = await userModel.findOneAndUpdate({ _id: ObjectId(id), isActive: true, otp: otp }, body, { new: true })
+        let response = await userModel.findOneAndUpdate({ _id: ObjectId(id), isActive: true }, body, { new: true })
         if (response) {
             return res.status(200).json(new apiResponse(200, responseMessage?.resetPasswordSuccess, { action: "please go to login page" }))
         }

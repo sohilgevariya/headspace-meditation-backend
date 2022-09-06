@@ -71,4 +71,7 @@ router.put('/explore/course/add', exploreValidation.add_explore_course, adminCon
 router.get('/explore/course/:id', exploreValidation.by_id, adminController.get_course_explore_wise);
 router.delete('/explore/:id', exploreValidation.by_id, adminController.delete_explore);
 
+// ------  Notification Routes  -------
+router.post('/notification/add', adminController?.add_notification)
+
 export const adminRouter = router
